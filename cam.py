@@ -19,30 +19,39 @@ def main():
       break
 
 def toASCII(frame, cols = 120, rows = 35):
-
-  frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-  height, width = frame.shape
+  # Get a GRAY Frame
+  grayFrame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+  # Get size ratio
+  height, width = grayFrame.shape
   cell_width = width / cols
   cell_height = height / rows
+  # Reject invalid sizes
   if cols > width or rows > height:
     raise ValueError('Too many cols or rows.')
-  result = ""
+  # Initialize return values
+  asciiText = ""
+  colorGrid = []
+  # Get gray's average of cells
   for i in range(rows):
+    #colorGrid.push([])
     for j in range(cols):
       gray = np.mean(
-        frame[int(i * cell_height):min(int((i + 1) * cell_height), height), int(j * cell_width):min(int((j + 1) * cell_width), width)]
+        grayFrame[int(i * cell_height):min(int((i + 1) * cell_height), height), int(j * cell_width):min(int((j + 1) * cell_width), width)]
       )
-      result += grayToChar(gray)
-    result += '\n'
-  return result
+      # Cast it to ascii char
+      asciiText += grayToChar(gray)
+      # TODO: Inject RGB in colorGrid
+      #colorGrid[i].push(RGB)
+    asciiText += '\n'
+  return asciiText
 
 def grayToChar(gray):
   CHAR_LIST = ' .:-=+*#%@'
   num_chars = len(CHAR_LIST)
   return CHAR_LIST[
     min(
-      int(gray * num_chars / 255),
-      num_chars - 1
+      int(gray * num_chars / 255), # current gray value
+      num_chars - 1 # max gray value
     )
   ]
   
